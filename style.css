@@ -1,0 +1,125 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Helvetica';
+    font-weight: 800;
+    background-color: #000;
+    color: #000;
+    overflow-x: hidden;
+}
+
+/* Layout */
+.split-container {
+    display: flex;
+    min-height: 100vh;
+    width: 100vw;
+}
+
+.left-panel {
+    width: 50%;
+    background-color: #aa0000; /* Vibrant Red */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4rem 2rem;
+}
+
+.right-panel {
+    width: 50%;
+    background-color: #0033cc; /* Deep Blue */
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Aligns image to bottom */
+    overflow: hidden;
+}
+
+/* Content Wrapper */
+.content-wrapper {
+    width: 100%;
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Title Graphic Placeholder */
+.title-graphic {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    margin-bottom: 1rem;
+}
+
+/* Tour Dates List */
+.tour-dates {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.tour-dates li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.25rem 0.5rem;
+    font-size: 1.25rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Hover Animation for Tour Dates */
+.tour-dates li:hover, .tour-dates li.active {
+    background-color: #000;
+    color: #ff0000;
+}
+
+/* Social Icons */
+.social-icons {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.social-icons a {
+    color: #000;
+    font-size: 1.8rem;
+    text-decoration: none;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy hover */
+}
+
+/* Hover Animation for Socials */
+.social-icons a:hover {
+    transform: scale(1.2);
+}
+
+/* Artist Image */
+.artist-image {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    object-fit: cover;
+    object-position: bottom;
+}
+
+/* Responsive Design for Mobile */
+@media screen and (max-width: 900px) {
+    .split-container {
+        flex-direction: column;
+    }
+
+    .left-panel, .right-panel {
+        width: 100%;
+        min-height: 50vh;
+    }
+    
+    .right-panel {
+        order: -1; /* Puts the artist image on top for mobile (optional) */
+        padding-top: 2rem;
+    }
+}

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poobon World Tour</title>
+    <style>
+        /* ================================================================ */
+        /* 🎛️ CONTROL PANEL 1/2: DESKTOP  (designed for 1920 x 1080)        */
+        /* ================================================================ */
+        /* On desktop the whole page scales with the window, and 1rem = 16px
+           at exactly 1920x1080. So every size below is in "1920x1080 units":
+           change a number and it stays proportional on any desktop screen.
+           Offsets: X + moves right, Y + moves down (negative = opposite). */
+        :root {
+            /* LEFT CONTENT BLOCK (logo + dates + socials, moved together) */
+            --content-width: 38rem;         /* width of the block (608px)   */
+            --content-offset-x: 0rem;
+            --content-offset-y: 0rem;
+
+            /* TITLE / LOGO */
+            --logo-width: 34rem;            /* title width (544px)          */
+            --logo-max-height: 26rem;       /* title never taller than this */
+            --logo-offset-x: 0rem;
+            --logo-offset-y: 0rem;
+            --logo-gap: 2.5rem;             /* space under the title        */
+
+            /* TOUR DATES */
+            --tour-text-size: 1.9rem;       /* city + date text size        */
+            --tour-row-pad-y: 0.55rem;      /* row height (top/bottom)      */
+            --tour-row-pad-x: 0.9rem;       /* row inner side padding       */
+            --strike-thickness: 0.25rem;    /* line through past concerts   */
+
+            /* SOCIAL ICONS */
+            --social-icon-size: 3rem;
+            --social-gap: 1.25rem;          /* space between icons          */
+            --socials-gap: 2.5rem;          /* space above the icons        */
+
+            /* ARTIST IMAGE (desktop only, hidden on mobile) */
+            /* Pinned to the far right edge and bottom of the screen.      */
+            --artist-width: 100%;
+            --artist-height: 100%;
+            --artist-scale: 1;              /* 1 = normal, 1.1 = 10% bigger */
+            --artist-offset-x: 0rem;
+            --artist-offset-y: 0rem;
+
+            /* MOBILE-ONLY (ignored on desktop) */
+            --panel-pad-y: 0rem;
+        }
+
+        /* Scales the page so 1920x1080 = 16px per rem, and it always fits */
+        html { font-size: min(0.8333vw, 1.4815vh); }
+
+
+        /* ================================================================ */
+        /* 🎛️ CONTROL PANEL 2/2: MOBILE  (screens 900px wide and under)     */
+        /* ================================================================ */
+        /* Same variables, mobile values. Here 1rem = 16px (no scaling). */
+        @media (max-width: 900px) {
+            :root {
+                --content-width: 90%;
+                --content-offset-x: 0rem;
+                --content-offset-y: 0rem;
+
+                --logo-width: 100%;
+                --logo-max-height: 60vh;
+                --logo-offset-x: 0rem;
+                --logo-offset-y: 0rem;
+                --logo-gap: 2rem;
+
+                --tour-text-size: 1.3rem;
+                --tour-row-pad-y: 0.5rem;
+                --tour-row-pad-x: 0.75rem;
+                --strike-thickness: 0.2rem;
+
+                --social-icon-size: 2.75rem;
+                --social-gap: 1rem;
+                --socials-gap: 2rem;
+
+                --panel-pad-y: 3rem;        /* space above/below the content */
+            }
+            html { font-size: 16px; }
+        }
+        /* ================================================================ */
+
+
+        /* 🔤 Helvetica Extra Bold — put helvetica-extra-bold.ttf next to this file */
+        @font-face {
+            font-family: 'Helvetica Extra Bold';
+            src: local('Helvetica Extra Bold'),
+                 local('Helvetica-ExtraBold'),
+                 url('helvetica-extra-bold.ttf') format('truetype');
+            font-weight: 800;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        /* Base Reset & Custom Cursor Enforcer */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none !important;
+            font-family: inherit;       /* every element uses the font below */
+        }
+
+        /* Strict Single Page Locking */
+        body {
+            font-family: 'Helvetica Extra Bold', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 800;
+            font-synthesis: none;       /* no fake bold, only the real font */
+            -webkit-text-size-adjust: 100%;
+            background-color: #ed1e24;
+            color: #000;
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        /* Custom Cursor Styling */
+        .custom-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            background-color: #000;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4);
+            transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .custom-cursor.hover-active {
+            background-color: #ed1e24;
+            transform: translate(-50%, -50%) scale(1.5);
+            box-shadow: 0px 8px 20px rgba(237, 30, 36, 0.5);
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Left Panel */
+        .left-panel {
+            width: 50%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Content Wrapper controlled by Variables */
+        .content-wrapper {
+            width: var(--content-width);
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            transform: translate(var(--content-offset-x), var(--content-offset-y));
+        }
+
+        .logo-container {
+            margin-bottom: var(--logo-gap);
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            transform: translate(var(--logo-offset-x), var(--logo-offset-y));
+        }
+
+        .logo-png {
+            width: var(--logo-width);
+            max-width: 100%;
+            max-height: var(--logo-max-height);
+            height: auto;
+            object-fit: contain;
+            display: block;
+            filter: url('#fractal-noise');
+            transition: filter 0.3s ease;
+        }
+
+        .tour-list {
+            list-style: none;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Tour Links controlled by Variables */
+        .tour-link {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--tour-row-pad-y) var(--tour-row-pad-x);
+            font-size: var(--tour-text-size);
+            line-height: 1.1;
+            font-weight: 800;
+            text-decoration: none;
+            color: #000;
+            text-transform: uppercase;
+        }
+
+        .tour-link:hover {
+            background-color: #000;
+            color: #ed1e24;
+        }
+
+        /* ✂️ Past concerts: on hover a line draws through city + date */
+        .tour-link .city,
+        .tour-link .date {
+            position: relative;
+        }
+
+        .tour-link.is-past .city::after,
+        .tour-link.is-past .date::after {
+            content: '';
+            position: absolute;
+            left: -0.15em;
+            right: -0.15em;
+            top: 52%;
+            height: var(--strike-thickness);
+            background-color: currentColor;
+            transform: translateY(-50%) scaleX(0);
+            transform-origin: left center;
+            transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+            pointer-events: none;
+        }
+
+        .tour-link.is-past:hover .city::after,
+        .tour-link.is-past:hover .date::after {
+            transform: translateY(-50%) scaleX(1);
+        }
+
+        .tour-link.is-past:hover .date::after {
+            transition-delay: 0.12s;   /* date gets crossed right after the city */
+        }
+
+        /* Social Icons controlled by Variables */
+        .socials {
+            display: flex;
+            gap: var(--social-gap);
+            justify-content: center;
+            margin-top: var(--socials-gap);
+        }
+
+        /* Each social button is a link holding a PNG.
+           The black circle is only a placeholder: it disappears
+           automatically once the PNG exists, and the PNG's own shape shows. */
+        .social-icon {
+            display: block;
+            width: var(--social-icon-size);
+            height: var(--social-icon-size);
+            background-color: #000;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+        }
+
+        .social-icon.has-img {
+            background-color: transparent;
+            border-radius: 0;
+        }
+
+        .social-icon img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .social-icon:hover {
+            transform: scale(1.15);
+        }
+
+        /* Right Panel: artist pinned to the far right edge, no gap */
+        .right-panel {
+            width: 50%;
+            height: 100%;
+            background-color: #ed1e24;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            overflow: hidden;
+        }
+
+        .artist-image {
+            width: var(--artist-width);
+            height: var(--artist-height);
+            object-fit: contain;
+            object-position: right bottom;
+            display: block;
+            transform: translate(var(--artist-offset-x), var(--artist-offset-y)) scale(var(--artist-scale));
+            transform-origin: right bottom;
+        }
+
+        /* Responsive Design for Mobile */
+        @media (max-width: 900px) {
+            body, .container {
+                height: auto;
+                overflow: auto;
+            }
+            .container { flex-direction: column; }
+            .right-panel { display: none; }   /* no artist image on mobile */
+            .left-panel {
+                width: 100%;
+                height: auto;
+                min-height: 100vh;
+                min-height: 100dvh;
+                padding: var(--panel-pad-y) 1.25rem;
+            }
+            .custom-cursor { display: none; }
+            * { cursor: auto !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========================================== -->
+    <!-- 🎛️ FRACTAL NOISE SVG FILTER CONTROLS 🎛️  -->
+    <!-- ========================================== -->
+    <svg style="width:0; height:0; position:absolute; pointer-events:none;">
+        <filter id="fractal-noise">
+            <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" result="noise">
+                <animate attributeName="baseFrequency" values="0.015; 0.025; 0.015" dur="6s" repeatCount="indefinite" />
+            </feTurbulence>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="12" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+    </svg>
+    <!-- ========================================== -->
+
+    <div class="custom-cursor" id="customCursor"></div>
+
+    <div class="container">
+        <div class="left-panel">
+            <div class="content-wrapper">
+                <div class="logo-container">
+                    <img src="assets/1.png" alt="Poobon World Tour" class="logo-png hover-target">
+                </div>
+
+                <!-- ================================================================ -->
+                <!-- 🔗 TOUR LINKS: replace each href="#PASTE-..." with the real link -->
+                <!--    (Ctrl+F "PASTE-" to jump between them)                         -->
+                <!-- 📅 data-date = YYYY-MM-DD. Once that day passes, the row gets      -->
+                <!--    the strike-through hover automatically. TBA rows have no date.  -->
+                <!-- ================================================================ -->
+                <div class="tour-list">
+                    <!-- FRANKFURT -->
+                    <a href="#PASTE-FRANKFURT-LINK-HERE" data-date="2026-10-02" target="_blank" rel="noopener" class="tour-link hover-target">
+                        <span class="city">Frankfurt</span>
+                        <span class="date">02.10.26</span>
+                    </a>
+                    <!-- HAMBURG -->
+                    <a href="#PASTE-HAMBURG-LINK-HERE" data-date="2026-10-03" target="_blank" rel="noopener" class="tour-link hover-target">
+                        <span class="city">Hamburg</span>
+                        <span class="date">03.10.26</span>
+                    </a>
+                    <!-- TORONTO -->
+                    <a href="https://dice.fm/event/ryo9ly-poobon-21st-nov-demo-room-toronto-tickets" data-date="2026-10-17" target="_blank" rel="noopener" class="tour-link hover-target">
+                        <span class="city">Toronto</span>
+                        <span class="date">17.10.26</span>
+                    </a>
+                    <!-- AMSTERDAM -->
+                    <a href="https://volek.events/event/poobon-live-in-amsterdam/?utm_source=ig&utm_medium=social&utm_content=link_in_bio" data-date="2026-11-06" target="_blank" rel="noopener" class="tour-link hover-target">
+                        <span class="city">Amsterdam</span>
+                        <span class="date">06.11.26</span>
+                    </a>
+                    <!-- SYDNEY -->
+                    <a href="#PASTE-SYDNEY-LINK-HERE" data-date="2027-02-05" target="_blank" rel="noopener" class="tour-link hover-target">
+                        <span class="city">Sydney</span>
+                        <span class="date">05.02.27</span>
+                    </a>
+                    <!-- MELBOURNE -->
+                    <a href="#PASTE-MELBOURNE-LINK-HERE" data-date="2027-02-12" target="_blank" rel="noopener" class="tour-link hover-target">
+                        <span class="city">Melbourne</span>
+                        <span class="date">12.02.27</span>
+                    </a>
+                    <!-- DUSSELDORF (date TBA: add data-date="YYYY-MM-DD" once announced) -->
+                    <a href="#PASTE-DUSSELDORF-LINK-HERE" target="_blank" rel="noopener" class="tour-link hover-target">
+                        <span class="city">Dusseldorf</span>
+                        <span class="date">TBA</span>
+                    </a>
+                    <!-- STOCKHOLM (date TBA: add data-date="YYYY-MM-DD" once announced) -->
+                    <a href="#PASTE-STOCKHOLM-LINK-HERE" target="_blank" rel="noopener" class="tour-link hover-target">
+                        <span class="city">Stockholm</span>
+                        <span class="date">TBA</span>
+                    </a>
+                    <!-- VANCOUVER (date TBA: add data-date="YYYY-MM-DD" once announced) -->
+                    <a href="#PASTE-VANCOUVER-LINK-HERE" target="_blank" rel="noopener" class="tour-link hover-target">
+                        <span class="city">Vancouver</span>
+                        <span class="date">TBA</span>
+                    </a>
+                </div>
+
+                <!-- ================================================================ -->
+                <!-- 🖼️ SOCIAL BUTTONS: for each one, replace the PNG file in src and   -->
+                <!--    the link in href (Ctrl+F "PASTE-SOCIAL"). Rename alt to the      -->
+                <!--    platform. Add or delete a whole <a> block for more or fewer.      -->
+                <!-- ================================================================ -->
+                <div class="socials">
+                    <a href="https://open.spotify.com/artist/4hdsAoRTkGU11DynAg7iTw" target="_blank" rel="noopener" class="social-icon hover-target">
+                        <img src="assets/social-1.png" alt="Social 1">
+                    </a>
+                    <a href="https://www.youtube.com/@PooBon" target="_blank" rel="noopener" class="social-icon hover-target">
+                        <img src="assets/social-2.png" alt="Social 2">
+                    </a>
+                    <a href="https://soundcloud.com/tetroparja" target="_blank" rel="noopener" class="social-icon hover-target">
+                        <img src="assets/social-3.png" alt="Social 3">
+                    </a>
+                    <a href="https://music.apple.com/ca/artist/poobon/1190165217" target="_blank" rel="noopener" class="social-icon hover-target">
+                        <img src="assets/social-4.png" alt="Social 4">
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <img src="assets/artist.png" alt="Poobon" class="artist-image hover-target">
+        </div>
+    </div>
+
+    <script>
+        const cursor = document.getElementById('customCursor');
+        const hoverTargets = document.querySelectorAll('.hover-target');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        hoverTargets.forEach(target => {
+            target.addEventListener('mouseenter', () => {
+                cursor.classList.add('hover-active');
+            });
+            target.addEventListener('mouseleave', () => {
+                cursor.classList.remove('hover-active');
+            });
+        });
+
+        // Mark concerts whose date already passed (data-date = YYYY-MM-DD).
+        // You can also add class="is-past" by hand on any row.
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        document.querySelectorAll('.tour-link[data-date]').forEach(link => {
+            const [y, m, d] = link.dataset.date.split('-').map(Number);
+            if (new Date(y, m - 1, d) < today) link.classList.add('is-past');
+        });
+
+        // Links still on a placeholder (#PASTE-...) do nothing when clicked
+        document.querySelectorAll('.tour-link, .social-icon').forEach(link => {
+            link.addEventListener('click', (e) => {
+                if (link.getAttribute('href').startsWith('#')) e.preventDefault();
+            });
+        });
+
+        // Social PNGs: once a PNG loads, the black placeholder circle goes away.
+        // If the PNG file doesn't exist yet, the black circle stays.
+        document.querySelectorAll('.social-icon img').forEach(img => {
+            const ok = () => img.parentElement.classList.add('has-img');
+            const fail = () => { img.style.display = 'none'; };
+            if (img.complete) {
+                img.naturalWidth ? ok() : fail();
+            } else {
+                img.addEventListener('load', ok);
+                img.addEventListener('error', fail);
+            }
+        });
+    </script>
+</body>
+</html>
